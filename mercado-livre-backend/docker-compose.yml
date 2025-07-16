@@ -1,0 +1,40 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mercado-livre-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: mercado_livre_db
+      MYSQL_USER: mercado_livre_user
+      MYSQL_PASSWORD: mercado123
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/scripts:/docker-entrypoint-initdb.d
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - mercado-livre-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: mercado-livre-phpmyadmin
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    ports:
+      - "8082:80"
+    networks:
+      - mercado-livre-network
+
+networks:
+  mercado-livre-network:
+    driver: bridge
